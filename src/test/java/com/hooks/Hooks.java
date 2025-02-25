@@ -3,8 +3,11 @@ package com.hooks;
 import com.aventstack.extentreports.MediaEntityBuilder;
 import com.driver.DriverManager;
 import com.reports.ExtentReportManager;
+import com.runner.TestRunner;
 import com.utils.ScenarioContextManager;
+import com.utils.UserPoolManager;
 import io.cucumber.java.After;
+import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import com.aventstack.extentreports.Status;
@@ -14,14 +17,28 @@ import org.openqa.selenium.WebDriver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 public class Hooks {
-    Logger logger = LogManager.getLogger(Hooks.class);
+    private static final Logger logger = LogManager.getLogger(Hooks.class);
+    private static final ThreadLocal<String[]> userCredentialsThreadLocal = new ThreadLocal<>();
     @Before
     public void beforeScenario(Scenario scenario) {
         logger.info(scenario.getName() + " : Test started...!!");
         ScenarioContextManager.setScenario(scenario);
         ExtentReportManager.setupExtentReport();
         ExtentReportManager.createTest(scenario);
+
+        // Check if a user is already present in ThreadLocal
+        if (userCredentialsThreadLocal.get() == null) {
+            String user = null;
+            try {
+                user = UserPoolManager.getUser();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String[] credentials = user.split("=")[1].split(",");
+            userCredentialsThreadLocal.set(credentials);
+        }
     }
 
     @After
@@ -38,5 +55,25 @@ public class Hooks {
             ExtentReportManager.getExtentTest().log(Status.PASS, "Scenario Passed: " + scenario.getName());
         }
         ExtentReportManager.flushExtentReport();
+        logger.info(System.getProperty("reuseBrowser") + " : reuseBrowser...!!");
+        logger.info(System.getProperty("reuseBrowserCount") + " : reuseBrowserCount...!!");
+        if (!TestRunner.reuseBrowser || DriverManager.getResetReuseCounter() == TestRunner.reuseBrowserCount){
+            DriverManager.quitDriver();
+            UserPoolManager.releaseUser();
+            userCredentialsThreadLocal.remove();
+            logger.info(scenario.getName() + " : Quiting browser instance...!!");
+        }else {
+            logger.info(" : Browser will be REUSED...!!");
+        }
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        DriverManager.closeAllDriverInstances();
+        System.out.println("Suite Completed: Quitting browser Instance...!");
+    }
+
+    public static String[] getUserCredentials() {
+        return userCredentialsThreadLocal.get();
     }
 }

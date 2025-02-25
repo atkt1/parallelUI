@@ -67,6 +67,9 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <browser>chrome</browser>
+        <reuseBrowser>true</reuseBrowser>
+        <reuseBrowserCount>2</reuseBrowserCount>
     </properties>
 
     <build>
@@ -88,9 +91,14 @@
                     <properties>
                         <property>
                             <name>dataproviderthreadcount</name>
-                            <value>6</value>
+                            <value>3</value>
                         </property>
                     </properties>
+                    <systemPropertyVariables>
+                        <browser>${browser}</browser>
+                        <reuseBrowser>${reuseBrowser}</reuseBrowser>
+                        <reuseBrowserCount>${reuseBrowserCount}</reuseBrowserCount>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <!-- Add any additional plugins here -->
