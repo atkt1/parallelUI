@@ -23,7 +23,7 @@ public class Hooks {
     private static final ThreadLocal<String[]> userCredentialsThreadLocal = new ThreadLocal<>();
     @Before
     public void beforeScenario(Scenario scenario) {
-        logger.info(scenario.getName() + " : Test started...!!");
+        logger.info("Thread ID: " + Thread.currentThread().getId() + ", Thread Name: " + Thread.currentThread().getName() + " - Scenario: " + scenario.getName() + " : Test started...!!"); // Add this log
         ScenarioContextManager.setScenario(scenario);
         ExtentReportManager.setupExtentReport();
         ExtentReportManager.createTest(scenario);
@@ -55,19 +55,17 @@ public class Hooks {
             ExtentReportManager.getExtentTest().log(Status.PASS, "Scenario Passed: " + scenario.getName());
         }
         ExtentReportManager.flushExtentReport();
-        logger.info(System.getProperty("reuseBrowser") + " : reuseBrowser...!!");
-        logger.info(System.getProperty("reuseBrowserCount") + " : reuseBrowserCount...!!");
-        if (!TestRunner.reuseBrowser || DriverManager.getResetReuseCounter() == TestRunner.reuseBrowserCount){
+        if (!TestRunner.reuseBrowser || DriverManager.getResetReuseCounter() >= TestRunner.reuseBrowserCount){
             DriverManager.quitDriver();
             UserPoolManager.releaseUser();
             userCredentialsThreadLocal.remove();
-            logger.info(scenario.getName() + " : Quiting browser instance...!!");
+            logger.info("Thread ID: " + Thread.currentThread().getId() + ", Thread Name: " + Thread.currentThread().getName() + " - Scenario: " + scenario.getName() + " : Quiting browser instance...!!"); // Add this log
         }else {
-            logger.info(" : Browser will be REUSED...!!");
+            logger.info("Thread ID: " + Thread.currentThread().getId() + ", Thread Name: " + Thread.currentThread().getName() + " - Scenario: " + scenario.getName() + " : Browser will be REUSED...!!");
         }
     }
 
-    @AfterAll
+   @AfterAll
     public static void afterAll() {
         DriverManager.closeAllDriverInstances();
         System.out.println("Suite Completed: Quitting browser Instance...!");

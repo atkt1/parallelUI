@@ -10,7 +10,7 @@ public class DummyPage extends BasePage{
     public void openBrowser(){
         System.out.println(Thread.currentThread().getId() +":Test started..!!" + driver.toString());
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
