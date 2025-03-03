@@ -12,7 +12,7 @@ import org.testng.annotations.BeforeSuite;
         glue = {"com.stepdefs", "com.hooks"},
         tags = "",
         monochrome = true,
-        plugin = {"pretty", "html:reports/cucumber-report.html"}
+        plugin = {"pretty", "html:results/cucumber-report.html"}
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 

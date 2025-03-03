@@ -73,7 +73,7 @@ local.properties
 
 # User-specific stuff
 .idea/
-reports/
+results/
 
 # AWS User-specific
 .idea/**/aws.xml
